@@ -1,69 +1,40 @@
 # anchor-rel-health-loom
 
-`anchor-rel-health-loom` is a focused Solidity codebase around develop a Solidity command-oriented project for health scenarios with safe and unsafe fixtures, remediation hints, and no credentials or hosted services. It is meant to be easy to inspect, run, and extend without a hosted service.
+`anchor-rel-health-loom` is a Solidity project in reliability. Its focus is to develop a Solidity command-oriented project for health scenarios with safe and unsafe fixtures, remediation hints, and no credentials or hosted services.
 
-## Anchor Rel Health Loom Walkthrough
+## Problem It Tries To Make Smaller
 
-I would read the project from the outside in: command, fixture, model, then roadmap. That keeps the reliability idea grounded in files that can be checked locally.
+The point is to make a small domain rule concrete enough that a reader can change it and immediately see what broke.
 
-## Reason For The Project
+## Anchor Rel Health Loom Review Notes
 
-The goal is to capture the core behavior in code and make the surrounding assumptions obvious. A reader should be able to run the verifier, open the fixtures, and understand why each decision was made.
+The first comparison I would make is `budget pressure` against `budget pressure` because it shows where the rule is most opinionated.
 
-## Data Notes
+## Working Pieces
 
-`examples/extended_cases.csv` adds six named cases. I kept the names plain so failures are easy to read in a terminal: baseline, pressure, surge, degraded, recovery, and boundary.
+- `fixtures/domain_review.csv` adds cases for budget pressure and failure width.
+- `metadata/domain-review.json` records the same cases in structured form.
+- `config/review-profile.json` captures the read order and the two review questions.
+- `examples/anchor-rel-health-walkthrough.md` walks through the case spread.
+- The Solidity code includes a review path for `budget pressure` and `budget pressure`.
+- `docs/field-notes.md` explains the strongest and weakest cases.
 
-## How It Is Put Together
+## Design Notes
 
-The core is a scoring model over demand, capacity, latency, risk, and weight. That keeps failure windows, retry budgets, and runbook checks in one explicit decision path. The threshold is 157, with risk penalty 6, latency penalty 4, and weight bonus 5. The Solidity project uses Foundry tests and pure contract functions so invariants are cheap to exercise.
+The core code exposes a scoring path and the added review layer uses `signal`, `slack`, `drag`, and `confidence`. The domain terms are `budget pressure`, `failure width`, `recovery gap`, and `runbook drift`.
 
-## Capabilities
+The Solidity checks add a pure review lens and Foundry coverage.
 
-- Models failure windows with deterministic scoring and explicit review decisions.
-- Uses fixture data to keep retry budgets changes visible in code review.
-- Includes extended examples for runbook checks, including `recovery` and `degraded`.
-- Documents recovery paths tradeoffs in `docs/operations.md`.
-- Runs locally with a single verification command and no external credentials.
-
-## Command Examples
+## Example Run
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1
 ```
 
-This runs the language-level build or test path against the compact fixture set.
+## Tests
 
-## Check The Work
+The same command runs the local verification path. The highest-scoring domain case is `stale` at 250, which lands in `ship`. The most cautious case is `baseline` at 131, which lands in `watch`.
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/audit.ps1
-```
+## Known Limits
 
-The audit command checks repository structure and README constraints before it delegates to the verifier.
-
-## Where Things Live
-
-- `src`: primary implementation
-- `test`: language test directory
-- `fixtures`: compact golden scenarios
-- `examples`: expanded scenario set
-- `metadata`: project constants and verification metadata
-- `docs`: operations and extension notes
-- `scripts`: local verification and audit commands
-- `foundry.toml`: Foundry project configuration
-
-## Possible Extensions
-
-- Split the scoring constants into a typed configuration object and validate it before use.
-- Add a comparison mode that shows how decisions change when one signal is adjusted.
-- Add a loader for `examples/extended_cases.csv` and promote selected cases into the language test suite.
-- Add one more reliability fixture that focuses on a malformed or borderline input.
-
-## Tradeoffs
-
-The repository favors determinism over breadth. It does not pull live data, keep secrets, or depend on network access for verification.
-
-## Getting It Running
-
-Install Solidity and run the commands from the repository root. The project does not need credentials or a hosted service.
+The fixture set is small enough to audit by hand. The next useful expansion is malformed input coverage, not extra surface area.
